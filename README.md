@@ -2,7 +2,7 @@
 ## A 6809-generating cross-compiler for a subset of the C language
 
 * [CMOC Home page](http://sarrazip.com/dev/cmoc.html), CMOC written by By Pierre Sarrazin
-* [Original README file](README_ORIGINAL)
+* [Original README file](README)
 
 
 ## License
