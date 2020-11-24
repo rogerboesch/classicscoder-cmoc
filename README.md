@@ -28,7 +28,7 @@ The goal is to create a full working C Wrapper for Vectrex in CMOC:
 * Include same functionality as in controller.h (Joystick abstraction) directly in c-wrapper
 
 ### Classics Coder - Vectrex Edition
-I use CMOC under the hood in [**Classics Coder - Vectrex Edition**]() and need therefore a more comprehensive C support for Vectrex development in CMOC.
+I use CMOC under the hood in [**Classics Coder - Vectrex Edition**](http://www.classicscoder.com) and need therefore a more comprehensive C support for Vectrex development in CMOC.
 
 
 ### Thanks!
