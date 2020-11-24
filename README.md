@@ -20,6 +20,6 @@ Most devs are using VIDE and gcc6809 as a toolchain, which results in more suppo
 The goal is to create a full working C-Wrapper for CMOC:
 
 * Use similar names as used in gcc6809 to simplify porting code
-* 
-Avoid higher level abstractions as inand make all bios calls available to developers using CMOC for Vectrex development.
-I use CMOC under the hood in Classics Coder Vectrex edition
+* Include same functionality as in controller.h (Joystick abstraction) directly in c-wrapper
+
+I use CMOC under the hood in [**Classics Coder Vectrex Edition**]() and need therefore a more comprehensive C-Support for Vectrex development in CMOC 
