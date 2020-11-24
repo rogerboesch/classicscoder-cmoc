@@ -1,8 +1,8 @@
 # CMOC
 ## A 6809-generating cross-compiler for a subset of the C language
 
-- [CMOC Home page](http://sarrazip.com/dev/cmoc.html)
-- [Original README file](README_ORIGINAL)
+* [CMOC Home page](http://sarrazip.com/dev/cmoc.html)
+* [Original README file](README_ORIGINAL)
 
 
 ## License
