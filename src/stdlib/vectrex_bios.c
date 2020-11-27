@@ -189,6 +189,18 @@ uint8_t read_btns() {
   return buttons;
 }
 
+void joy_digital() {
+  asm {
+    JSR Joy_Digital
+  }  
+}
+
+void joy_analog() {
+  asm {
+    JSR Joy_Analog
+  }  
+}
+
 // Helper functions to simplyify access to some sysvars (keeped from previous implementation)
 
 void set_text_size(int8_t height, int8_t width) {
@@ -216,6 +228,7 @@ void music_set_flag(uint8_t flag) {
 
 uint8_t music_get_flag() {
   uint8_t flag;
+
   asm {
     LDA     Vec_Music_Flag
     STA     flag
@@ -320,3 +333,272 @@ LF50A:
   }
 }
 
+// Controller/Joystick helpers
+
+int8_t last_horizontal1;
+int8_t last_vertical1;
+
+// controller initialization, each controller axis can be individually
+// switched on or off; for performance reasons, activate only what you really need
+
+void controller_enable_1_x() {
+  asm {
+    LDA     1
+    STA     Vec_Joy_Mux_1_X
+  }
+}
+
+void controller_enable_1_y() {
+  asm {
+    LDA     3
+    STA     Vec_Joy_Mux_1_Y
+  }
+}
+
+void controller_enable_2_x() {
+  asm {
+    LDA     5
+    STA     Vec_Joy_Mux_2_X
+  }
+}
+
+void controller_enable_2_y() {
+  asm {
+    LDA     7
+    STA     Vec_Joy_Mux_2_Y
+  }
+}
+
+void controller_disable_1_x() {
+  asm {
+    LDA     0
+    STA     Vec_Joy_Mux_1_X
+  }
+}
+
+void controller_disable_1_y() {
+  asm {
+    LDA     0
+    STA     Vec_Joy_Mux_1_Y
+  }
+}
+
+void controller_disable_2_x() {
+  asm {
+    LDA     0
+    STA     Vec_Joy_Mux_2_X
+  }
+}
+
+void controller_disable_2_y() {
+  asm {
+    LDA     0
+    STA     Vec_Joy_Mux_2_Y
+  }
+}
+
+// ---------------------------------------------------------------------------
+// read controller buttons
+
+// must be called once each time you want to check the buttons
+void controller_check_buttons() {
+	read_btns();
+}
+
+uint8_t controller_buttons_pressed() {
+  uint8_t flag;
+
+  asm {
+    LDA     Vec_Buttons
+    STA     flag
+  }  
+
+  return flag;
+}
+
+uint8_t controller_buttons_held() {
+  uint8_t flag;
+
+  asm {
+    LDA     Vec_Btn_State
+    STA     flag
+  }  
+
+  return flag;
+}
+
+// call these functions below to check if a specific button is pressed,
+// the button must be released before another press is registered,
+// return value is 0 or 1, so these functions can be used as check in
+// conditional statements
+
+uint8_t controller_button_1_1_pressed() {
+	return (controller_buttons_pressed() & 0b00000001);
+}
+
+uint8_t controller_button_1_2_pressed() {
+	return (controller_buttons_pressed() & 0b00000010);
+}
+
+uint8_t controller_button_1_3_pressed() {
+	return (controller_buttons_pressed() & 0b00000100);
+}
+
+uint8_t controller_button_1_4_pressed() {
+	return (controller_buttons_pressed() & 0b00001000);
+}
+
+uint8_t controller_button_2_1_pressed() {
+	return (controller_buttons_pressed() & 0b00010000);
+}
+
+uint8_t controller_button_2_2_pressed() {
+	return (controller_buttons_pressed() & 0b00100000);
+}
+uint8_t controller_button_2_3_pressed() {
+	return (controller_buttons_pressed() & 0b01000000);
+}
+
+uint8_t controller_button_2_4_pressed() {
+	return (controller_buttons_pressed() & 0b10000000);
+}
+
+// call these functions below to check if a specific button is held,
+// return value is 0 or 1, so these functions can be used as check in conditional statements
+
+uint8_t controller_button_1_1_held() {
+	return (controller_buttons_held() & 0b00000001);
+}
+
+uint8_t controller_button_1_2_held() {
+	return (controller_buttons_held() & 0b00000010);
+}
+
+uint8_t controller_button_1_3_held() {
+	return (controller_buttons_held() & 0b00000100);
+}
+
+uint8_t controller_button_1_4_held() {
+	return (controller_buttons_held() & 0b00001000);
+}
+
+uint8_t controller_button_2_1_held() {
+	return (controller_buttons_held() & 0b00010000);
+}
+
+uint8_t controller_button_2_2_held() {
+	return (controller_buttons_held() & 0b00100000);
+}
+
+uint8_t controller_button_2_3_held() {
+	return (controller_buttons_held() & 0b01000000);
+}
+
+uint8_t controller_button_2_4_held() {
+	return (controller_buttons_held() & 0b10000000);
+}
+
+// read controller joysticks
+// must be called once each time you want to check the joysticks
+
+void controller_check_joysticks() {
+  last_horizontal1 = controller_joystick_1_x();
+  last_vertical1 = controller_joystick_1_y();
+
+	joy_digital();
+}
+
+int8_t controller_joystick_1_x() {
+  int8_t flag;
+
+  asm {
+    LDA     Vec_Joy_1_X
+    STA     flag
+  }  
+
+  return flag;
+}
+
+int8_t controller_joystick_1_y() {
+  int8_t flag;
+
+  asm {
+    LDA     Vec_Joy_1_Y
+    STA     flag
+  }  
+
+  return flag;
+}
+
+int8_t controller_joystick_2_x() {
+  int8_t flag;
+
+  asm {
+    LDA     Vec_Joy_2_X
+    STA     flag
+  }  
+
+  return flag;
+}
+
+int8_t controller_joystick_2_y() {
+  int8_t flag;
+
+  asm {
+    LDA     Vec_Joy_2_Y
+    STA     flag
+  }  
+
+  return flag;
+}
+
+// call these functions below to check if a joystick is moved in a specific direction,
+// return value is 0 or 1, so these functions can be used as check in conditional statements
+
+uint8_t controller_joystick_1_leftChange() {
+	return (controller_joystick_1_x() < 0)&& (last_horizontal1 >= 0);
+}
+
+uint8_t controller_joystick_1_rightChange() {
+	return (controller_joystick_1_x() > 0)&& (last_horizontal1 <= 0);
+}
+
+uint8_t controller_joystick_1_downChange() {
+	return (controller_joystick_1_y() < 0) && (last_vertical1 >= 0);
+}
+
+uint8_t controller_joystick_1_upChange() {
+    	return (controller_joystick_1_y() > 0) && (last_vertical1 <= 0);
+}
+
+uint8_t controller_joystick_1_left() {
+	return (controller_joystick_1_x() < 0);
+}
+
+uint8_t controller_joystick_1_right() {
+	return (controller_joystick_1_x() > 0);
+}
+
+uint8_t controller_joystick_1_down() {
+	return (controller_joystick_1_y() < 0);
+}
+
+uint8_t controller_joystick_1_up() {
+	return (controller_joystick_1_y() > 0);
+}
+
+uint8_t controller_joystick_2_left() {
+	return (controller_joystick_2_x() < 0);
+}
+
+uint8_t controller_joystick_2_right() {
+	return (controller_joystick_2_x() > 0);
+}
+
+uint8_t controller_joystick_2_down() {
+	return (controller_joystick_2_y() < 0);
+}
+
+uint8_t controller_joystick_2_up() {
+	return (controller_joystick_2_y() > 0);
+}

@@ -75,6 +75,8 @@ void init_os();
 void set_refresh(uint16_t value);
 int8_t random();
 uint8_t read_btns();
+void joy_digital();
+void joy_analog();
 
 // Helper functions to simplyify access to some sysvars (keeped from previous implementation)
 void set_text_size(int8_t height, int8_t width);
@@ -85,5 +87,55 @@ void random_seed(uint8_t seed1, uint8_t seed2, uint8_t seed3);
 
 // C-style print function
 void print_str_c(int8_t y, int8_t x, char* string);
+
+// Controller/Joystick helpers
+void controller_enable_1_x();
+void controller_enable_1_y();
+void controller_enable_2_x();
+void controller_enable_2_y();
+void controller_disable_1_x();
+void controller_disable_1_y();
+void controller_disable_2_x();
+void controller_disable_2_y();
+
+void controller_check_buttons();
+uint8_t controller_buttons_pressed();
+uint8_t controller_buttons_held();
+
+uint8_t controller_button_1_1_pressed();
+uint8_t controller_button_1_2_pressed();
+uint8_t controller_button_1_3_pressed();
+uint8_t controller_button_1_4_pressed();
+uint8_t controller_button_2_1_pressed();
+uint8_t controller_button_2_2_pressed();
+uint8_t controller_button_2_3_pressed();
+uint8_t controller_button_2_4_pressed();
+
+uint8_t controller_button_1_1_held();
+uint8_t controller_button_1_2_held();
+uint8_t controller_button_1_3_held();
+uint8_t controller_button_1_4_held();
+uint8_t controller_button_2_1_held();
+uint8_t controller_button_2_2_held();
+uint8_t controller_button_2_3_held();
+uint8_t controller_button_2_4_held();
+
+void controller_check_joysticks();
+int8_t controller_joystick_1_x();
+int8_t controller_joystick_1_y();
+int8_t controller_joystick_2_x();
+int8_t controller_joystick_2_y();
+uint8_t controller_joystick_1_leftChange();
+uint8_t controller_joystick_1_rightChange();
+uint8_t controller_joystick_1_downChange();
+uint8_t controller_joystick_1_upChange();
+uint8_t controller_joystick_1_left();
+uint8_t controller_joystick_1_right();
+uint8_t controller_joystick_1_down();
+uint8_t controller_joystick_1_up();
+uint8_t controller_joystick_2_left();
+uint8_t controller_joystick_2_right();
+uint8_t controller_joystick_2_down();
+uint8_t controller_joystick_2_up();
 
 #endif // __vectrex_bios_h__
