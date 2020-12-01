@@ -1,7 +1,7 @@
 #ifndef __vectrex_bios_h__
 #define __vectrex_bios_h__
 
-#include <vectrex.h>
+#include <vectrex/types.h>
 
 // Expose Vectrex music addreses
 #define vx_music_1  (char*) 0xFD0D

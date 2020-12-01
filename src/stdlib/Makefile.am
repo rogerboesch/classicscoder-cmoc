@@ -20,6 +20,8 @@ cmocinc_HEADERS = \
 vectrexincdir = $(cmocincdir)/vectrex
 vectrexinc_HEADERS = \
 	vectrex/stdlib.h \
+    vectrex/compatibility.h \
+    vectrex/types.h \
 	vectrex/bios.h
 
 # The ecb, usim, os9, vec and dgn keywords in these library names
