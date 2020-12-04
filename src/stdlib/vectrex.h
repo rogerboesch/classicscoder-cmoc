@@ -5,6 +5,5 @@
 
 #include <vectrex/bios.h>
 #include <vectrex/compatibility.h>
-#include <vectrex/stdlib.h>
 
 #endif

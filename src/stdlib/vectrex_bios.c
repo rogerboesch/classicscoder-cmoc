@@ -25,6 +25,10 @@ void reset0ref() {
   }  
 }
 
+void zero_beam() {
+  reset0ref();
+}
+
 void print_str_d(int8_t y, int8_t x, char* string) {
   asm {
     JSR     DP_to_D0
@@ -81,6 +85,13 @@ void draw_vl_a(uint8_t nr_lines, int8_t* list) {
     DECA
     LDX     list
     JSR     Draw_VL_a
+  }
+}
+
+void draw_vlc(int8_t* list) {
+  asm {
+    LDX     list
+    JSR     Draw_VLc
   }
 }
 
@@ -331,6 +342,15 @@ LF50A:
     ; --
     PULS    U
   }
+}
+
+// Math helpers
+
+uint8_t abs(int8_t value) {
+  if (value < 0)
+    return -value;
+
+  return value;  
 }
 
 // Controller/Joystick helpers
@@ -602,3 +622,9 @@ uint8_t controller_joystick_2_down() {
 uint8_t controller_joystick_2_up() {
 	return (controller_joystick_2_y() > 0);
 }
+
+// ---------------------------------------------------------------------------
+// Music support (not implemented yet)
+
+void stop_music() {}
+void stop_sound() {}
