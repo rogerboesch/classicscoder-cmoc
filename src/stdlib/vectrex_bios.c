@@ -1,9 +1,11 @@
 #include "vectrex/bios.h"
 
-// New gcc style wrappers
+// ---------------------------------------------------------------------------
+// GCC style functions (Uppercase variants in compatibility.h)
 
 void asm wait_recal() {
-  asm {  // get the equates; STD_INC_PATH must be defined by Makefile.am
+  asm {
+    // STD_INC_PATH must be defined by Makefile.am
     INCLUDE STD_INC_PATH
   }
 
@@ -22,14 +24,14 @@ void intensity_a(uint8_t i) {
 void reset0ref() {
   asm {
     JSR Reset0Ref
-  }  
+  }
 }
 
 void zero_beam() {
   reset0ref();
 }
 
-void print_str_d(int8_t y, int8_t x, char* string) {
+void print_str_d(int8_t y, int8_t x, char *string) {
   asm {
     JSR     DP_to_D0
     LDA     :y 
@@ -50,7 +52,7 @@ void dot_d(int8_t y, int8_t x) {
   }
 }
 
-void dot_list(uint8_t nr_dots, int8_t* list) {
+void dot_list(uint8_t nr_dots, int8_t *list) {
   asm {
     JSR     DP_to_D0
     LDA     nr_dots
@@ -78,7 +80,7 @@ void draw_line_d(int8_t y, int8_t x) {
   }
 }
 
-void draw_vl_a(uint8_t nr_lines, int8_t* list) {
+void draw_vl_a(uint8_t nr_lines, int8_t *list) {
   asm {
     JSR     DP_to_D0
     LDA     nr_lines
@@ -88,7 +90,7 @@ void draw_vl_a(uint8_t nr_lines, int8_t* list) {
   }
 }
 
-void draw_vlc(int8_t* list) {
+void draw_vlc(int8_t *list) {
   asm {
     LDX     list
     JSR     Draw_VLc
@@ -103,11 +105,11 @@ void draw_pat_vl_a(uint8_t pattern, uint8_t nr_lines, int8_t *list) {
     LDA     nr_lines
     DECA
     LDX     list
-    JSR     Draw_Pat_VL_a 
+    JSR     Draw_Pat_VL_a
   }
 }
 
-void rot_vl_ab(int8_t angle, uint8_t nr_points, int8_t* points, int8_t* out_points) {
+void rot_vl_ab(int8_t angle, uint8_t nr_points, int8_t *points, int8_t *out_points) {
   asm {
     PSHS    U,D
     LDA     angle
@@ -118,9 +120,9 @@ void rot_vl_ab(int8_t angle, uint8_t nr_points, int8_t* points, int8_t* out_poin
     JSR     Rot_VL_ab  
     PULS    U,D
   }
-}  
+}
 
-void init_music_chk(unsigned char* music) {
+void init_music_chk(int8_t *music) {
   asm {
     PSHS    U
     JSR     DP_to_C8
@@ -133,6 +135,18 @@ void init_music_chk(unsigned char* music) {
 void do_sound() {
   asm {
     JSR     Do_Sound
+  }
+}
+
+void clear_sound() {
+  asm {
+      JSR     Clear_Sound
+  }
+}
+
+void explosion_sound() {
+  asm {
+      JSR     Explosion_Snd
   }
 }
 
@@ -179,10 +193,10 @@ void set_refresh(uint16_t value) {
 
 int8_t random() {
   int8_t rnd;
-  
+
   asm {
     JSR Random
-    STA rnd  
+    STA rnd
   }
 
   return rnd;
@@ -194,7 +208,7 @@ uint8_t read_btns() {
   asm {
     JSR DP_to_D0
     JSR Read_Btns
-    STA buttons    
+    STA buttons
   }
 
   return buttons;
@@ -203,16 +217,18 @@ uint8_t read_btns() {
 void joy_digital() {
   asm {
     JSR Joy_Digital
-  }  
+  }
 }
 
 void joy_analog() {
   asm {
     JSR Joy_Analog
-  }  
+  }
 }
 
-// Helper functions to simplyify access to some sysvars (keeped from previous implementation)
+// ---------------------------------------------------------------------------
+// Helper functions to simplyify access to some static ram areas
+// All can now also be done by using directly the Vex_xxx variables
 
 void set_text_size(int8_t height, int8_t width) {
   asm {
@@ -226,7 +242,7 @@ void set_text_size(int8_t height, int8_t width) {
 void set_scale(int8_t scale) {
   asm {
     LDA     scale
-    STA     <VIA_t1_cnt_lo 
+    STA     <VIA_t1_cnt_lo
   }
 }
 
@@ -243,7 +259,7 @@ uint8_t music_get_flag() {
   asm {
     LDA     Vec_Music_Flag
     STA     flag
-  }  
+  }
 
   return flag;
 }
@@ -255,13 +271,49 @@ void random_seed(uint8_t seed1, uint8_t seed2, uint8_t seed3) {
      LDA  seed2
      STA  Vec_Seed_Ptr+1   
      LDA  seed3
-     STA  Vec_Seed_Ptr+2   
+     STA  Vec_Seed_Ptr+2
   }
-} 
+}
 
+void dp_to_d0() {
+  asm {
+        JSR DP_to_D0
+  }
+}
+
+void dp_to_c8() {
+  asm {
+        JSR DP_to_C8
+  }
+}
+
+void sound_byte(uint8_t reg, uint8_t value) {
+  // Not yet tested
+  asm {
+    PSHS    X,Y
+    LDA reg
+    LDB value
+
+    JSR Sound_Byte
+
+    PULS    X,Y
+  }
+}
+
+void sound_bytes(const void* sound_block) {
+  asm {
+    PSHS D,X,Y,U
+    LDU sound_block
+    JSR Sound_Bytes
+
+    PULS D,X,Y,U
+  }
+}
+
+// ---------------------------------------------------------------------------
 // C-style print function
 
-void print_str_c(int8_t y, int8_t x, char* string) {
+void print_str_c(int8_t y, int8_t x, char *string) {
   asm {
     JSR     DP_to_D0
     LDA     :y 
@@ -344,22 +396,24 @@ LF50A:
   }
 }
 
+// ---------------------------------------------------------------------------
 // Math helpers
 
 uint8_t abs(int8_t value) {
   if (value < 0)
     return -value;
 
-  return value;  
+  return value;
 }
 
+// ---------------------------------------------------------------------------
 // Controller/Joystick helpers
+
+// Initialization, each controller axis can be individually
+// switched on or off; for performance reasons, activate only what you really need
 
 int8_t last_horizontal1;
 int8_t last_vertical1;
-
-// controller initialization, each controller axis can be individually
-// switched on or off; for performance reasons, activate only what you really need
 
 void controller_enable_1_x() {
   asm {
@@ -417,12 +471,11 @@ void controller_disable_2_y() {
   }
 }
 
-// ---------------------------------------------------------------------------
-// read controller buttons
+// Read controller buttons
+// Must be called once each time you want to check the buttons
 
-// must be called once each time you want to check the buttons
 void controller_check_buttons() {
-	read_btns();
+  read_btns();
 }
 
 uint8_t controller_buttons_pressed() {
@@ -431,7 +484,7 @@ uint8_t controller_buttons_pressed() {
   asm {
     LDA     Vec_Buttons
     STA     flag
-  }  
+  }
 
   return flag;
 }
@@ -442,7 +495,7 @@ uint8_t controller_buttons_held() {
   asm {
     LDA     Vec_Btn_State
     STA     flag
-  }  
+  }
 
   return flag;
 }
@@ -453,69 +506,69 @@ uint8_t controller_buttons_held() {
 // conditional statements
 
 uint8_t controller_button_1_1_pressed() {
-	return (controller_buttons_pressed() & 0b00000001);
+  return (controller_buttons_pressed() & 0b00000001);
 }
 
 uint8_t controller_button_1_2_pressed() {
-	return (controller_buttons_pressed() & 0b00000010);
+  return (controller_buttons_pressed() & 0b00000010);
 }
 
 uint8_t controller_button_1_3_pressed() {
-	return (controller_buttons_pressed() & 0b00000100);
+  return (controller_buttons_pressed() & 0b00000100);
 }
 
 uint8_t controller_button_1_4_pressed() {
-	return (controller_buttons_pressed() & 0b00001000);
+  return (controller_buttons_pressed() & 0b00001000);
 }
 
 uint8_t controller_button_2_1_pressed() {
-	return (controller_buttons_pressed() & 0b00010000);
+  return (controller_buttons_pressed() & 0b00010000);
 }
 
 uint8_t controller_button_2_2_pressed() {
-	return (controller_buttons_pressed() & 0b00100000);
+  return (controller_buttons_pressed() & 0b00100000);
 }
 uint8_t controller_button_2_3_pressed() {
-	return (controller_buttons_pressed() & 0b01000000);
+  return (controller_buttons_pressed() & 0b01000000);
 }
 
 uint8_t controller_button_2_4_pressed() {
-	return (controller_buttons_pressed() & 0b10000000);
+  return (controller_buttons_pressed() & 0b10000000);
 }
 
 // call these functions below to check if a specific button is held,
 // return value is 0 or 1, so these functions can be used as check in conditional statements
 
 uint8_t controller_button_1_1_held() {
-	return (controller_buttons_held() & 0b00000001);
+  return (controller_buttons_held() & 0b00000001);
 }
 
 uint8_t controller_button_1_2_held() {
-	return (controller_buttons_held() & 0b00000010);
+  return (controller_buttons_held() & 0b00000010);
 }
 
 uint8_t controller_button_1_3_held() {
-	return (controller_buttons_held() & 0b00000100);
+  return (controller_buttons_held() & 0b00000100);
 }
 
 uint8_t controller_button_1_4_held() {
-	return (controller_buttons_held() & 0b00001000);
+  return (controller_buttons_held() & 0b00001000);
 }
 
 uint8_t controller_button_2_1_held() {
-	return (controller_buttons_held() & 0b00010000);
+  return (controller_buttons_held() & 0b00010000);
 }
 
 uint8_t controller_button_2_2_held() {
-	return (controller_buttons_held() & 0b00100000);
+  return (controller_buttons_held() & 0b00100000);
 }
 
 uint8_t controller_button_2_3_held() {
-	return (controller_buttons_held() & 0b01000000);
+  return (controller_buttons_held() & 0b01000000);
 }
 
 uint8_t controller_button_2_4_held() {
-	return (controller_buttons_held() & 0b10000000);
+  return (controller_buttons_held() & 0b10000000);
 }
 
 // read controller joysticks
@@ -525,7 +578,7 @@ void controller_check_joysticks() {
   last_horizontal1 = controller_joystick_1_x();
   last_vertical1 = controller_joystick_1_y();
 
-	joy_digital();
+  joy_digital();
 }
 
 int8_t controller_joystick_1_x() {
@@ -534,7 +587,7 @@ int8_t controller_joystick_1_x() {
   asm {
     LDA     Vec_Joy_1_X
     STA     flag
-  }  
+  }
 
   return flag;
 }
@@ -545,7 +598,7 @@ int8_t controller_joystick_1_y() {
   asm {
     LDA     Vec_Joy_1_Y
     STA     flag
-  }  
+  }
 
   return flag;
 }
@@ -556,7 +609,7 @@ int8_t controller_joystick_2_x() {
   asm {
     LDA     Vec_Joy_2_X
     STA     flag
-  }  
+  }
 
   return flag;
 }
@@ -567,7 +620,7 @@ int8_t controller_joystick_2_y() {
   asm {
     LDA     Vec_Joy_2_Y
     STA     flag
-  }  
+  }
 
   return flag;
 }
@@ -576,55 +629,108 @@ int8_t controller_joystick_2_y() {
 // return value is 0 or 1, so these functions can be used as check in conditional statements
 
 uint8_t controller_joystick_1_leftChange() {
-	return (controller_joystick_1_x() < 0)&& (last_horizontal1 >= 0);
+  return (controller_joystick_1_x() < 0) && (last_horizontal1 >= 0);
 }
 
 uint8_t controller_joystick_1_rightChange() {
-	return (controller_joystick_1_x() > 0)&& (last_horizontal1 <= 0);
+  return (controller_joystick_1_x() > 0) && (last_horizontal1 <= 0);
 }
 
 uint8_t controller_joystick_1_downChange() {
-	return (controller_joystick_1_y() < 0) && (last_vertical1 >= 0);
+  return (controller_joystick_1_y() < 0) && (last_vertical1 >= 0);
 }
 
 uint8_t controller_joystick_1_upChange() {
-    	return (controller_joystick_1_y() > 0) && (last_vertical1 <= 0);
+  return (controller_joystick_1_y() > 0) && (last_vertical1 <= 0);
 }
 
 uint8_t controller_joystick_1_left() {
-	return (controller_joystick_1_x() < 0);
+  return (controller_joystick_1_x() < 0);
 }
 
 uint8_t controller_joystick_1_right() {
-	return (controller_joystick_1_x() > 0);
+  return (controller_joystick_1_x() > 0);
 }
 
 uint8_t controller_joystick_1_down() {
-	return (controller_joystick_1_y() < 0);
+  return (controller_joystick_1_y() < 0);
 }
 
 uint8_t controller_joystick_1_up() {
-	return (controller_joystick_1_y() > 0);
+  return (controller_joystick_1_y() > 0);
 }
 
 uint8_t controller_joystick_2_left() {
-	return (controller_joystick_2_x() < 0);
+  return (controller_joystick_2_x() < 0);
 }
 
 uint8_t controller_joystick_2_right() {
-	return (controller_joystick_2_x() > 0);
+  return (controller_joystick_2_x() > 0);
 }
 
 uint8_t controller_joystick_2_down() {
-	return (controller_joystick_2_y() < 0);
+  return (controller_joystick_2_y() < 0);
 }
 
 uint8_t controller_joystick_2_up() {
-	return (controller_joystick_2_y() > 0);
+  return (controller_joystick_2_y() > 0);
 }
 
 // ---------------------------------------------------------------------------
-// Music support (not implemented yet)
+// Music support (not completely implemented yet)
 
-void stop_music() {}
-void stop_sound() {}
+#define BP(x) *((uint8_t *) x)
+#define Vec_Music_Flag BP(0xC856) // Music active flag (0x00=off 0x01=start 0x80=on)
+#define Vec_Snd_Shadow BP(0xC800) // Shadow of sound chip registers (15 bytes)
+
+void* g_current_music = 0;
+uint8_t g_last_music_flag = Vec_Music_Flag;
+
+void play_music(void* music) {
+  Vec_Music_Flag = 1;
+  g_current_music = music;
+}
+
+void stop_music() {
+  if (Vec_Music_Flag != 0) {
+      Vec_Music_Flag = 0;
+      g_last_music_flag = 0;
+      g_current_music = 0;
+
+      clear_sound();
+  }
+}
+
+int8_t is_music_playing() {
+  return Vec_Music_Flag != 0;
+}
+
+void play_sound(const void *sound_block) {
+  stop_music();
+  sound_bytes(sound_block);
+}
+
+void stop_sound() {
+  clear_sound();
+}
+
+void update_audio() {
+	if (Vec_Music_Flag != 0) {
+		init_music_chk(g_current_music);
+	}
+
+	if (Vec_Music_Flag == 0 && g_last_music_flag != 0) {
+		clear_sound();
+    g_current_music = 0;
+	}
+
+  g_last_music_flag = Vec_Music_Flag;
+}
+
+void wait_for_beam() {
+  update_audio();
+  wait_recal();
+	do_sound();
+
+  // Maybe include here later reading joystick
+}

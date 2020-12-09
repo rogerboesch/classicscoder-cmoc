@@ -136,7 +136,7 @@
 #define Xform_Run xform_run
 
 // Byte pointer
-#define BP(x) *((volatile uint8_t *) x)
+#define BP(x) *((uint8_t *) x)
 
 // Static RAM
 #define Vec_Snd_Shadow       BP(0xC800) // Shadow of sound chip registers (15 bytes)
